@@ -1,0 +1,88 @@
+pipeline {
+    agent any
+
+    environment {
+        GITHUB_CREDENTIALS = 'github-https'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
+        BACKEND_IMAGE = "dhruvshah0612/fusion-backend"
+        FRONTEND_IMAGE = "dhruvshah0612/fusion-frontend"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                echo "Checking out code from GitHub..."
+                git branch: 'main',
+                    url: 'https://github.com/DhruvShah0612/fusionpact-devops-challenge.git',
+                    credentialsId: "${GITHUB_CREDENTIALS}"
+            }
+        }
+
+        stage('Docker Test') {
+            steps {
+                echo "Testing Docker access..."
+                sh 'docker --version'
+            }
+        }
+
+        stage('Build and Push Backend Docker Image') {
+            steps {
+                echo "Building Backend Docker image..."
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKERHUB_CREDENTIALS}") {
+                        def backend = docker.build("${BACKEND_IMAGE}:${env.BUILD_NUMBER}", "./backend")
+                        backend.push()
+                    }
+                }
+            }
+        }
+
+        stage('Build and Push Frontend Docker Image') {
+            steps {
+                echo "Building Frontend Docker image..."
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKERHUB_CREDENTIALS}") {
+                        def frontend = docker.build("${FRONTEND_IMAGE}:${env.BUILD_NUMBER}", "./frontend")
+                        frontend.push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Backend & Frontend') {
+            steps {
+                echo "Deploying Docker containers..."
+                sh '''
+                # Backend Deployment
+                docker pull ${BACKEND_IMAGE}:${BUILD_NUMBER}
+                docker stop fusion-backend || true
+                docker rm fusion-backend || true
+                docker run -d -p 5000:5000 --name fusion-backend ${BACKEND_IMAGE}:${BUILD_NUMBER}
+
+                # Frontend Deployment
+                docker pull ${FRONTEND_IMAGE}:${BUILD_NUMBER}
+                docker stop fusion-frontend || true
+                docker rm fusion-frontend || true
+                docker run -d -p 8080:8080 --name fusion-frontend ${FRONTEND_IMAGE}:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+    }
+
+    post {
+        always {
+            echo "Cleaning up dangling Docker images..."
+            sh 'docker image prune -f || true'
+        }
+
+        success {
+            echo "Pipeline completed successfully! ✅"
+        }
+
+        failure {
+            echo "Pipeline failed! ❌ Check the logs for errors."
+        }
+    }
+}
