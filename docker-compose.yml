@@ -1,0 +1,65 @@
+version: '3.9'
+
+services:
+  # -----------------
+  # MySQL Database
+  # -----------------
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fusionpact
+      MYSQL_USER: fusionuser
+      MYSQL_PASSWORD: fusionpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - fusionnet
+
+  # -----------------
+  # Backend - FastAPI
+  # -----------------
+  backend:
+    build: ./backend
+    container_name: fusion-backend
+    restart: always
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: fusionuser
+      DATABASE_PASSWORD: fusionpass
+      DATABASE_NAME: fusionpact
+      DATABASE_PORT: 3306
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    networks:
+      - fusionnet
+
+  # -----------------
+  # Frontend - React/Vite
+  # -----------------
+  frontend:
+    build: ./frontend
+    container_name: fusion-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fusionnet
+
+# -----------------
+# Named Volumes & Network
+# -----------------
+volumes:
+  mysql_data:
+
+networks:
+  fusionnet:
+    driver: bridge
