@@ -139,15 +139,13 @@ Implement complete observability for the deployed application by monitoring both
 
 #### 1. Docker Compose
 
-Use the following [`docker-compose.yml`](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/docker-compose.yml) for Level 2:
+Use the following [`docker-compose.yml`](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/docker-compose.yml):
 
 ---
 
 #### 2. Prometheus Configuration ([`prometheus.yml`](prometheus.yml))
 
-Use the following [`docker-compose.yml`](docker-compose.yml) for Level 2:
-
-[View prometheus.yml on GitHub](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/prometheus.yml)
+[`prometheus.yml`](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/prometheus.yml):
 
 ---
 
@@ -171,7 +169,7 @@ docker ps
 - Prometheus UI allows you to query and visualize metrics directly.
 
 **Prometheus UI Screenshot Example:**  
-![Prometheus UI](screenshots/prometheus-ui.png)
+![Prometheus UI](prometheus.png)
 
 ---
 
@@ -181,7 +179,7 @@ docker ps
 - This endpoint exposes host-level metrics in plain text format.
 
 **Node Exporter Screenshot Example:**  
-![Node Exporter Metrics](screenshots/node-exporter.png)
+![Node Exporter Metrics](node-exporter.png)
 
 ---
 
