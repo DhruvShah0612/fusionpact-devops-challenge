@@ -259,7 +259,7 @@ This pipeline automates **build, push, and deploy** stages using Jenkins and Doc
 
 ### 📝 Jenkins Pipeline Script Example
 
-<add pipline link>
+[`Jenkins Pipeline Script`](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/Jenkinsfile)
 
 ---
 
@@ -304,11 +304,14 @@ docker run -d \
 
 ### 🌐 Access
 
-- Jenkins Web UI: [http://<EC2-PUBLIC-IP>:8080](http://<EC2-PUBLIC-IP>:8080)
-- Backend App: [http://<EC2-PUBLIC-IP>:8080](http://<EC2-PUBLIC-IP>:8080)
+- Jenkins Web UI: [http://13.200.87.44:8080](http://13.200.87.44:8080)
 
 ---
 
 This setup ensures a fully automated CI/CD pipeline from GitHub → Jenkins → Docker → EC2 deployment.
+
+---
+
+**Author:** [Dhruv Shah](https://github.com/DhruvShah0612)
 
 ---
