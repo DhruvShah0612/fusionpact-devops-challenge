@@ -253,6 +253,5 @@ Add Prometheus as a data source:
 | `node_cpu_seconds_total`                | mode, instance     | user, idle   | CPU usage per mode         |
 | `node_filesystem_avail_bytes`           | mountpoint, instance| /, /home    | Disk space available       |
 | `node_network_receive_bytes_total`      | interface, instance| eth0         | Network bytes received     |
-| `node_network_transmit_bytes_total`     | interface, instance| eth0         | Network bytes transmitted  |
 
 ---
