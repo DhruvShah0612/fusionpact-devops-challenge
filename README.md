@@ -63,11 +63,11 @@ fusionpact-devops-challenge/
 
 ---
 
-### 🌐 Accessing the Application
+## 🌐 Accessing the Application
 
-- **Frontend:** [http://<EC2-PUBLIC-IP>/](http://<EC2-PUBLIC-IP>/)
-- **Backend:** [http://<EC2-PUBLIC-IP>:8000](http://<EC2-PUBLIC-IP>:8000)
-
+- **Frontend:** [http://13.200.87.44/](http://13.200.87:44/)
+- **Backend:** [http://13.200.87:44:8000](http://13.200.87:44:8000)
+  
 ---
 
 ### 🗄️ MySQL Persistence Verification
@@ -110,9 +110,9 @@ fusionpact-devops-challenge/
 
 ### 📸 Screenshots (for SOP)
 
-- Frontend page in browser
-- Backend API endpoint
-- MySQL showing persisted data
+- ![Frontend Screenshot](frontend-page.png)
+- ![Backend Screenshot](backend-page.png)
+- ![MySQL Screenshot](mysql-page.png)
 
 ---
 
@@ -139,21 +139,15 @@ Implement complete observability for the deployed application by monitoring both
 
 #### 1. Docker Compose
 
-Use the following [`docker-compose.yml`](docker-compose.yml) for Level 2:
-
-```yaml
-
-```
+Use the following [`docker-compose.yml`](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/docker-compose.yml) for Level 2:
 
 ---
 
 #### 2. Prometheus Configuration ([`prometheus.yml`](prometheus.yml))
 
-```yaml
+Use the following [`docker-compose.yml`](docker-compose.yml) for Level 2:
 
-```
-
-Prometheus scrapes metrics from the backend application and Node Exporter every 15 seconds.
+[View prometheus.yml on GitHub](https://github.com/DhruvShah0612/fusionpact-devops-challenge/blob/main/prometheus.yml)
 
 ---
 
@@ -171,7 +165,27 @@ docker ps
 
 ---
 
-#### 4. Access Grafana
+#### 4. Access Prometheus
+
+- URL: `http://<EC2-PUBLIC-IP>:9090`
+- Prometheus UI allows you to query and visualize metrics directly.
+
+**Prometheus UI Screenshot Example:**  
+![Prometheus UI](screenshots/prometheus-ui.png)
+
+---
+
+#### 5. Access Node Exporter
+
+- URL: `http://<EC2-PUBLIC-IP>:9100/metrics`
+- This endpoint exposes host-level metrics in plain text format.
+
+**Node Exporter Screenshot Example:**  
+![Node Exporter Metrics](screenshots/node-exporter.png)
+
+---
+
+#### 6. Access Grafana
 
 - URL: `http://<EC2-PUBLIC-IP>:3000`
 - Username: `admin`
@@ -184,7 +198,7 @@ Add Prometheus as a data source:
 
 ---
 
-#### 5. Create Dashboards
+#### 7. Create Dashboards
 
 **Application Metrics Panels:**
 
@@ -193,6 +207,9 @@ Add Prometheus as a data source:
 | `http_requests_total`       | handler, method, status| /api/login, GET, 200   | Total HTTP requests per endpoint                      |
 | `http_request_duration_seconds` | handler, le, method | /api/register, le="0.5"| Request latency per endpoint (used for percentiles)   |
 
+- ![Dashboard Screenshot](dashboard4.png)
+- ![Dashboard Screenshot](dashboard5.png)
+
 **Infrastructure Metrics Panels (Node Exporter):**
 
 | Metric                                 | Label Filter        | Example Value | Description                |
@@ -200,7 +217,10 @@ Add Prometheus as a data source:
 | `node_cpu_seconds_total`                | mode, instance     | user, idle   | CPU usage per mode         |
 | `node_filesystem_avail_bytes`           | mountpoint, instance| /, /home    | Disk space available       |
 | `node_network_receive_bytes_total`      | interface, instance| eth0         | Network bytes received     |
-| `node_network_transmit_bytes_total`     | interface, instance| eth0         | Network bytes transmitted  |
+
+- ![Dashboard Screenshot](dashboard1.png)
+- ![Dashboard Screenshot](dashboard2.png)
+- ![Dashboard Screenshot](dashboard3.png)
 
 ---
 
