@@ -1,6 +1,8 @@
-# Fusionpact DevOps Challenge – Level 1: Cloud Deployment
+# Fusionpact DevOps Challenge
 
-## 🚀 Objective
+## Level 1: Cloud Deployment
+
+### 🚀 Objective
 
 Deploy the full stack application on an AWS Ubuntu EC2 instance using Docker and Docker Compose with MySQL persistent storage.  
 - **Frontend:** Accessible on port `80`  
@@ -8,25 +10,27 @@ Deploy the full stack application on an AWS Ubuntu EC2 instance using Docker and
 
 ---
 
-## 📁 Repository Structure
+### 📁 Repository Structure
 
 ```
-.
-├── README.md
-├── backend
-│   ├── Dockerfile
-│   ├── requirements.txt
+fusionpact-devops-challenge/
+├── README.md                                # Project documentation (with pipeline info)
+├── SOP CREATE HOME WEBPAGE USING NGINX SERVER.pdf  # SOP file
+├── backend/                                 # Backend microservice
+│   ├── Dockerfile                           # Dockerfile for backend
+│   ├── requirements.txt                     # Python dependencies
 │   └── app/
-├── frontend
-│   ├── Dockerfile
-│   └── Devops_Intern.html
-├── docker-compose.yml
-└── SOP Level1.pdf
+├── frontend/                                # Frontend microservice
+│   ├── Dockerfile                           # Dockerfile for frontend
+│   └── Devops_Intern.html                   # Frontend HTML file
+├── docker-compose.yml                       # Multi-container orchestration
+├── prometheus.yml                           # Prometheus monitoring config
+└── jenkins_home/                            # Jenkins persistent data (mounted from host)
 ```
 
 ---
 
-## 🛠️ Prerequisites
+### 🛠️ Prerequisites
 
 - Docker installed on the server
 - Docker Compose installed
@@ -37,39 +41,36 @@ Deploy the full stack application on an AWS Ubuntu EC2 instance using Docker and
 
 ---
 
-## 📝 Deployment Steps
+### 📝 Deployment Steps
 
-### 1. Clone the Repository
+1. **Clone the Repository**
+    ```bash
+    git clone <YOUR-FORKED-REPO-URL>
+    cd fusionpact-devops-challenge
+    ```
 
-```bash
-git clone <YOUR-FORKED-REPO-URL>
-cd fusionpact-devops-challenge
-```
+2. **Build and Start Containers**
+    ```bash
+    sudo docker-compose down --volumes --remove-orphans
+    sudo docker-compose up -d --build
+    ```
 
-### 2. Build and Start Containers
-
-```bash
-sudo docker-compose down --volumes --remove-orphans
-sudo docker-compose up -d --build
-```
-
-### 3. Verify Running Containers
-
-```bash
-sudo docker ps
-```
-You should see `frontend`, `backend`, and `mysql-db` containers running.
+3. **Verify Running Containers**
+    ```bash
+    sudo docker ps
+    ```
+    You should see `frontend`, `backend`, and `mysql-db` containers running.
 
 ---
 
-## 🌐 Accessing the Application
+### 🌐 Accessing the Application
 
 - **Frontend:** [http://<EC2-PUBLIC-IP>/](http://<EC2-PUBLIC-IP>/)
 - **Backend:** [http://<EC2-PUBLIC-IP>:8000](http://<EC2-PUBLIC-IP>:8000)
 
 ---
 
-## 🗄️ MySQL Persistence Verification
+### 🗄️ MySQL Persistence Verification
 
 1. **Connect to MySQL container:**
     ```bash
@@ -97,7 +98,7 @@ You should see `frontend`, `backend`, and `mysql-db` containers running.
 
 ---
 
-## 🐳 Docker Compose Services
+### 🐳 Docker Compose Services
 
 | Service   | Ports      | Description                      |
 |-----------|------------|----------------------------------|
@@ -107,17 +108,11 @@ You should see `frontend`, `backend`, and `mysql-db` containers running.
 
 ---
 
-## 📸 Screenshots (for SOP)
+### 📸 Screenshots (for SOP)
 
 - Frontend page in browser
 - Backend API endpoint
 - MySQL showing persisted data
-
----
-
-## 👤 Author
-
-Dhruv Shah
 
 ---
 
@@ -147,44 +142,7 @@ Implement complete observability for the deployed application by monitoring both
 Use the following [`docker-compose.yml`](docker-compose.yml) for Level 2:
 
 ```yaml
-version: '3.9'
 
-services:
-  x-prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - fusionnet
-
-  x-grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    networks:
-      - fusionnet
-    depends_on:
-      - x-prometheus
-
-  x-node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    ports:
-      - "9100:9100"
-    networks:
-      - fusionnet
-    restart: always
-
-networks:
-  fusionnet:
-    driver: bridge
 ```
 
 ---
@@ -192,17 +150,7 @@ networks:
 #### 2. Prometheus Configuration ([`prometheus.yml`](prometheus.yml))
 
 ```yaml
-global:
-  scrape_interval: 15s
 
-scrape_configs:
-  - job_name: 'backend'
-    static_configs:
-      - targets: ['backend:8080']  # replace with actual backend host and port
-
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['x-node-exporter:9100']
 ```
 
 Prometheus scrapes metrics from the backend application and Node Exporter every 15 seconds.
@@ -236,7 +184,6 @@ Add Prometheus as a data source:
 
 ---
 
----
 #### 5. Create Dashboards
 
 **Application Metrics Panels:**
@@ -253,39 +200,13 @@ Add Prometheus as a data source:
 | `node_cpu_seconds_total`                | mode, instance     | user, idle   | CPU usage per mode         |
 | `node_filesystem_avail_bytes`           | mountpoint, instance| /, /home    | Disk space available       |
 | `node_network_receive_bytes_total`      | interface, instance| eth0         | Network bytes received     |
+| `node_network_transmit_bytes_total`     | interface, instance| eth0         | Network bytes transmitted  |
 
 ---
 
----
 ## Level 3 – CI/CD Pipeline
 
 This section describes the Level 3 CI/CD pipeline for the FusionPact DevOps Challenge, using Jenkins, Docker, and AWS EC2.
-
----
-
-### 📁 Project Structure
-
-```
-fusionpact-devops-challenge/
-├── README.md
-├── backend/
-│   ├── Dockerfile
-│   ├── app/
-│   │   ├── main.py
-│   │   └── ...
-│   └── requirements.txt
-├── frontend/
-│   ├── Dockerfile
-│   └── Devops_Intern.html
-├── docker-compose.yml
-├── prometheus.yml
-└── SOP CREATE HOME WEBPAGE USING NGINX SERVER.pdf
-```
-
-- `backend/` → Python backend code and Dockerfile  
-- `frontend/` → HTML frontend and Dockerfile  
-- `docker-compose.yml` → Multi-container orchestration  
-- `prometheus.yml` → Prometheus monitoring config
 
 ---
 
@@ -320,49 +241,7 @@ This pipeline automates **build, push, and deploy** stages using Jenkins and Doc
 
 ### 📝 Jenkins Pipeline Script Example
 
-```groovy
-pipeline {
-  agent any
-
-  stages {
-    stage('Checkout Code') {
-      steps {
-        git branch: 'main',
-            url: 'https://github.com/DhruvShah0612/fusionpact-devops-challenge.git',
-            credentialsId: 'github-https'
-      }
-    }
-
-    stage('Docker Test') {
-      steps {
-        sh 'docker --version'
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
-        script {
-          docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-            def app = docker.build("dhruvshah0612/fusionpact:${env.BUILD_NUMBER}")
-            app.push()
-          }
-        }
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-        sh '''
-        docker pull dhruvshah0612/fusionpact:${BUILD_NUMBER}
-        docker stop fusionpact || true
-        docker rm fusionpact || true
-        docker run -d -p 8080:8080 --name fusionpact dhruvshah0612/fusionpact:${BUILD_NUMBER}
-        '''
-      }
-    }
-  }
-}
-```
+<add pipline link>
 
 ---
 
