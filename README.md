@@ -231,7 +231,7 @@ docker ps
 
 Add Prometheus as a data source:
 
-- URL: `http://x-prometheus:9090`
+- URL: `http://<EC2-PUBLIC-IP>:9090`
 - Click **Save & Test** → should show "Data source is working" ✅
 
 ---
