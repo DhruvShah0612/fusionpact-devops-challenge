@@ -55,6 +55,33 @@ services:
       - fusionnet
 
 # -----------------
+  # Prometheus
+  # -----------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - fusionnet
+
+ # -----------------
+  # Grafana
+  # -----------------
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    networks:
+      - fusionnet
+
+# -----------------
 # Named Volumes & Network
 # -----------------
 volumes:

@@ -1,1 +1,1 @@
-fastapiuvicornpymysqlsqlalchemypython-dotenvprometheus-fastapi-instrumentator
+prometheus-clientfastapiuvicornpymysqlsqlalchemypython-dotenvprometheus-fastapi-instrumentator
