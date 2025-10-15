@@ -255,3 +255,163 @@ Add Prometheus as a data source:
 | `node_network_receive_bytes_total`      | interface, instance| eth0         | Network bytes received     |
 
 ---
+
+---
+## Level 3 – CI/CD Pipeline
+
+This section describes the Level 3 CI/CD pipeline for the FusionPact DevOps Challenge, using Jenkins, Docker, and AWS EC2.
+
+---
+
+### 📁 Project Structure
+
+```
+fusionpact-devops-challenge/
+├── README.md
+├── backend/
+│   ├── Dockerfile
+│   ├── app/
+│   │   ├── main.py
+│   │   └── ...
+│   └── requirements.txt
+├── frontend/
+│   ├── Dockerfile
+│   └── Devops_Intern.html
+├── docker-compose.yml
+├── prometheus.yml
+└── SOP CREATE HOME WEBPAGE USING NGINX SERVER.pdf
+```
+
+- `backend/` → Python backend code and Dockerfile  
+- `frontend/` → HTML frontend and Dockerfile  
+- `docker-compose.yml` → Multi-container orchestration  
+- `prometheus.yml` → Prometheus monitoring config
+
+---
+
+### 🚀 CI/CD Pipeline Overview
+
+This pipeline automates **build, push, and deploy** stages using Jenkins and Docker.
+
+#### **Pipeline Stages**
+
+1. **Checkout Code**
+    - Pulls latest code from GitHub repository (`HTTPS`) using `github-https` credentials.
+
+2. **Docker Test**
+    - Checks Docker version to ensure Jenkins can access Docker.
+
+3. **Build Docker Image**
+    - Builds Docker images from `backend` and `frontend` Dockerfiles.
+    - Tags image as `dhruvshah0612/fusionpact:<BUILD_NUMBER>`.
+
+4. **Push to Docker Hub**
+    - Pushes the Docker image to Docker Hub using `dockerhub-creds`.
+
+5. **Deploy**
+    - Stops existing container if running.
+    - Removes old container.
+    - Runs the new Docker container on EC2 host.
+
+6. **Post Actions**
+    - Cleans up dangling Docker images to save space.
+
+---
+
+### 📝 Jenkins Pipeline Script Example
+
+```groovy
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout Code') {
+      steps {
+        git branch: 'main',
+            url: 'https://github.com/DhruvShah0612/fusionpact-devops-challenge.git',
+            credentialsId: 'github-https'
+      }
+    }
+
+    stage('Docker Test') {
+      steps {
+        sh 'docker --version'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
+            def app = docker.build("dhruvshah0612/fusionpact:${env.BUILD_NUMBER}")
+            app.push()
+          }
+        }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sh '''
+        docker pull dhruvshah0612/fusionpact:${BUILD_NUMBER}
+        docker stop fusionpact || true
+        docker rm fusionpact || true
+        docker run -d -p 8080:8080 --name fusionpact dhruvshah0612/fusionpact:${BUILD_NUMBER}
+        '''
+      }
+    }
+  }
+}
+```
+
+---
+
+### 🛠️ Jenkins Container Setup
+
+To run Jenkins with Docker access:
+
+```sh
+docker run -d \
+  --name jenkins-docker \
+  -p 8080:8080 -p 50000:50000 \
+  -v /home/ubuntu/jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e DOCKER_GROUP_ID=$(getent group docker | cut -d: -f3) \
+  jenkins/jenkins:lts
+```
+
+- Persist Jenkins data in `/home/ubuntu/jenkins_home`
+- Share Docker socket for Jenkins to access Docker
+
+---
+
+### 🔑 Credentials Used
+
+| Credential ID   | Type               | Purpose                                 |
+|-----------------|--------------------|-----------------------------------------|
+| github-https    | Username/Token     | GitHub HTTPS code checkout              |
+| dockerhub-creds | Username/Password  | Docker Hub push                         |
+| ec2-ssh-key     | Private key (opt.) | Deploy to remote EC2 (if separate host) |
+
+---
+
+### ✅ Verification
+
+- `docker ps` on EC2 shows running containers.
+- `curl http://<EC2-PUBLIC-IP>:8080` → Backend app accessible.
+- Jenkins shows all stages successful.
+- Docker inside Jenkins can build and push images.
+- Dangling images cleaned automatically.
+
+---
+
+### 🌐 Access
+
+- Jenkins Web UI: [http://<EC2-PUBLIC-IP>:8080](http://<EC2-PUBLIC-IP>:8080)
+- Backend App: [http://<EC2-PUBLIC-IP>:8080](http://<EC2-PUBLIC-IP>:8080)
+
+---
+
+This setup ensures a fully automated CI/CD pipeline from GitHub → Jenkins → Docker → EC2 deployment.
+
+---
