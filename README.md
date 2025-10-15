@@ -236,41 +236,23 @@ Add Prometheus as a data source:
 
 ---
 
+---
 #### 5. Create Dashboards
 
 **Application Metrics Panels:**
 
-| Panel                  | Query                        | Description                  |
-|------------------------|-----------------------------|------------------------------|
-| Backend Request Count  | `app_request_count`         | Number of requests served    |
-| Request Latency        | `app_request_latency_seconds`| Backend latency              |
-| Error Count            | `app_error_count`           | Total errors                 |
+| Metric                      | Label Filter            | Example Value           | Description                                           |
+|-----------------------------|------------------------|------------------------|-------------------------------------------------------|
+| `http_requests_total`       | handler, method, status| /api/login, GET, 200   | Total HTTP requests per endpoint                      |
+| `http_request_duration_seconds` | handler, le, method | /api/register, le="0.5"| Request latency per endpoint (used for percentiles)   |
 
 **Infrastructure Metrics Panels (Node Exporter):**
 
-| Panel           | Query                                                                 | Description         |
-|-----------------|-----------------------------------------------------------------------|---------------------|
-| CPU Usage       | `100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)` | CPU utilization     |
-| Memory Available| `node_memory_MemAvailable_bytes`                                      | Free memory         |
-| Disk Available  | `node_filesystem_avail_bytes`                                         | Free disk space     |
-
-Arrange all panels on a single dashboard for a complete view.  
-Use full-screen mode (Shift + F) for screenshots.
-
----
-
-#### 6. Deliverables
-
-- [`prometheus.yml`](prometheus.yml) configuration file
-- Screenshots of Grafana dashboard showing:
-  - Application Metrics (request count, latency, error)
-  - Infrastructure Metrics (CPU, memory, disk)
-
----
-
-> **Notes:**
-> - Node Exporter does not have a UI; metrics are only visible in Grafana.
-> - Keep time ranges consistent when taking screenshots for SOP.
-> - This setup ensures real-time observability of both backend and host resources.
+| Metric                                 | Label Filter        | Example Value | Description                |
+|-----------------------------------------|--------------------|--------------|----------------------------|
+| `node_cpu_seconds_total`                | mode, instance     | user, idle   | CPU usage per mode         |
+| `node_filesystem_avail_bytes`           | mountpoint, instance| /, /home    | Disk space available       |
+| `node_network_receive_bytes_total`      | interface, instance| eth0         | Network bytes received     |
+| `node_network_transmit_bytes_total`     | interface, instance| eth0         | Network bytes transmitted  |
 
 ---
