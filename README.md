@@ -120,3 +120,157 @@ You should see `frontend`, `backend`, and `mysql-db` containers running.
 Dhruv Shah
 
 ---
+
+## Level 2 – Monitoring & Observability
+
+### 🚦 Objective
+
+Implement complete observability for the deployed application by monitoring both application metrics and infrastructure metrics using Prometheus, Node Exporter, and Grafana.
+
+---
+
+### 🧩 Components Used
+
+| Component      | Purpose                                                        |
+| -------------- | -------------------------------------------------------------- |
+| Prometheus     | Collects metrics from the backend application and Node Exporter|
+| Grafana        | Visualizes metrics in dashboards for real-time monitoring      |
+| Node Exporter  | Exposes host-level metrics (CPU, memory, disk) for Prometheus  |
+| Docker Compose | Deploys all services in isolated containers                    |
+
+---
+
+### ⚙️ Setup Instructions
+
+#### 1. Docker Compose
+
+Use the following [`docker-compose.yml`](docker-compose.yml) for Level 2:
+
+```yaml
+version: '3.9'
+
+services:
+  x-prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - fusionnet
+
+  x-grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - fusionnet
+    depends_on:
+      - x-prometheus
+
+  x-node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - fusionnet
+    restart: always
+
+networks:
+  fusionnet:
+    driver: bridge
+```
+
+---
+
+#### 2. Prometheus Configuration ([`prometheus.yml`](prometheus.yml))
+
+```yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend:8080']  # replace with actual backend host and port
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['x-node-exporter:9100']
+```
+
+Prometheus scrapes metrics from the backend application and Node Exporter every 15 seconds.
+
+---
+
+#### 3. Start Services
+
+```sh
+docker-compose up -d
+```
+
+Verify containers are running:
+
+```sh
+docker ps
+```
+
+---
+
+#### 4. Access Grafana
+
+- URL: `http://<EC2-PUBLIC-IP>:3000`
+- Username: `admin`
+- Password: `admin`
+
+Add Prometheus as a data source:
+
+- URL: `http://x-prometheus:9090`
+- Click **Save & Test** → should show "Data source is working" ✅
+
+---
+
+#### 5. Create Dashboards
+
+**Application Metrics Panels:**
+
+| Panel                  | Query                        | Description                  |
+|------------------------|-----------------------------|------------------------------|
+| Backend Request Count  | `app_request_count`         | Number of requests served    |
+| Request Latency        | `app_request_latency_seconds`| Backend latency              |
+| Error Count            | `app_error_count`           | Total errors                 |
+
+**Infrastructure Metrics Panels (Node Exporter):**
+
+| Panel           | Query                                                                 | Description         |
+|-----------------|-----------------------------------------------------------------------|---------------------|
+| CPU Usage       | `100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)` | CPU utilization     |
+| Memory Available| `node_memory_MemAvailable_bytes`                                      | Free memory         |
+| Disk Available  | `node_filesystem_avail_bytes`                                         | Free disk space     |
+
+Arrange all panels on a single dashboard for a complete view.  
+Use full-screen mode (Shift + F) for screenshots.
+
+---
+
+#### 6. Deliverables
+
+- [`prometheus.yml`](prometheus.yml) configuration file
+- Screenshots of Grafana dashboard showing:
+  - Application Metrics (request count, latency, error)
+  - Infrastructure Metrics (CPU, memory, disk)
+
+---
+
+> **Notes:**
+> - Node Exporter does not have a UI; metrics are only visible in Grafana.
+> - Keep time ranges consistent when taking screenshots for SOP.
+> - This setup ensures real-time observability of both backend and host resources.
+
+---
