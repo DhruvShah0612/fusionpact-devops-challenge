@@ -65,8 +65,8 @@ fusionpact-devops-challenge/
 
 ## 🌐 Accessing the Application
 
-- **Frontend:** [http://13.200.87.44/](http://13.200.87:44/)
-- **Backend:** [http://13.200.87:44:8000](http://13.200.87:44:8000)
+- **Frontend:** http://NEW_PUBLIC_IP/
+- **Backend:** http://NEW_PUBLIC_IP:8000
   
 ---
 
@@ -302,9 +302,9 @@ docker run -d \
 
 ---
 
-### 🌐 Access
+### 🌐 Access 
 
-- Jenkins Web UI: [http://13.200.87.44:8080](http://13.200.87.44:8080)
+- **Jenkins Web UI:** http://NEW_PUBLIC_IP:8080
 
 ---
 
